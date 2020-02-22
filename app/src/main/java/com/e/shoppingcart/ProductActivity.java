@@ -9,12 +9,18 @@ import android.graphics.BitmapFactory;
 import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -25,37 +31,46 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class ProductActivity extends AppCompatActivity {
 
     private DatabaseReference dbRef;
-    //private StorageReference storageRef;
 
     private Bitmap bmp;
     private ImageView img;
+    private HashMap<ModelProduct, Integer> inCart = new HashMap<ModelProduct, Integer>();
 
     private class GetImageTask extends AsyncTask<Void, Void, Void> {
         ModelProduct prod;
         TextView txtName;
+        TextView txtCost;
         ImageView img;
+        Spinner spinner;
+        EditText txtQty;
+        Button btnAddToCart;
+        Button btnCheckout;
 
-        public GetImageTask(ModelProduct prod, TextView txtName, ImageView img) {
+        public GetImageTask(ModelProduct prod, TextView txtName, TextView txtCost, ImageView img, Spinner spinner,
+                            EditText txtQty, Button btnAddToCart, Button btnCheckout) {
             this.txtName = txtName;
+            this.txtCost = txtCost;
             this.img = img;
             this.prod = prod;
+            this.spinner = spinner;
+            this.txtQty = txtQty;
+            this.btnAddToCart = btnAddToCart;
+            this.btnCheckout = btnCheckout;
         }
 
         @Override
         protected Void doInBackground(Void... params) {
             try {
                 URL url = new URL(prod.imgUrl);
-                Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-            } catch(Exception e) {
-                e.printStackTrace();
-            }
-
-            try {
-                URL url = new URL("https://firebasestorage.googleapis.com/v0/b/store-160a0.appspot.com/o/adidas.jpg?alt=media&token=1fca85c0-a408-4c54-bffd-7f083a04373c");
                 bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
             } catch(Exception e) {
                 e.printStackTrace();
@@ -64,7 +79,43 @@ public class ProductActivity extends AppCompatActivity {
         }
         protected void onPostExecute(Void result) {
             txtName.setText(prod.name);
+            txtCost.setText(new Integer(prod.cost).toString());
             img.setImageBitmap(bmp);
+
+            List<String> list = new ArrayList<String>();
+            list.add("Small");
+            list.add("Medium");
+            list.add("Large");
+            ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(ProductActivity.this, android.R.layout.simple_spinner_item, list);
+            dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinner.setAdapter(dataAdapter);
+
+            btnAddToCart.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String qty = txtQty.getText().toString();
+                    if(TextUtils.isEmpty(qty)) {
+                        Toast.makeText(ProductActivity.this, "Invalid Quantity", Toast.LENGTH_SHORT).show();
+                    } else {
+                        if(inCart.get(prod) == null) {
+                            inCart.put(prod, Integer.parseInt(qty));
+                        } else {
+                            inCart.put(prod, inCart.get(prod) + Integer.parseInt(qty));
+                        }
+                    }
+                }
+            });
+
+            btnCheckout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Iterator itr = inCart.entrySet().iterator();
+                    while (itr.hasNext()) {
+                        Map.Entry mapElement = (Map.Entry)itr.next();
+                        System.out.println(mapElement.getKey() + " : " + mapElement.getValue());
+                    }
+                }
+            });
         }
     }
 
@@ -73,7 +124,6 @@ public class ProductActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product);
 
-        //storageRef = FirebaseStorage.getInstance().getReference("Images");
         dbRef = FirebaseDatabase.getInstance().getReference().child("Product");
 
         final LinearLayout layout = findViewById(R.id.layoutProdImages);
@@ -87,8 +137,13 @@ public class ProductActivity extends AppCompatActivity {
 
                 View view = inflater.inflate(R.layout.product_item, layout, false);
                 TextView txtName = view.findViewById(R.id.txtviewProdName);
+                TextView cost = view.findViewById(R.id.txtviewProdCost);
                 ImageView img = view.findViewById(R.id.imgviewProdTest);
-                new GetImageTask(prod, txtName, img).execute();
+                Spinner spinner = view.findViewById(R.id.spinnerProdSize);
+                EditText txtQty = view.findViewById(R.id.txtProdQty);
+                Button btnAddToCart = view.findViewById(R.id.btnProdToCart);
+                Button btnCheckout = view.findViewById(R.id.btnProdCheckout);
+                new GetImageTask(prod, txtName, cost, img, spinner, txtQty, btnAddToCart, btnCheckout).execute();
                 layout.addView(view);
             }
 
@@ -113,61 +168,5 @@ public class ProductActivity extends AppCompatActivity {
             }
         });
 
-
-        //imgView = findViewById(R.id.imgviewProdTest);
-        //new GetImageTask().execute();
-
-        /*List<String> sizes = new ArrayList<String>();
-        sizes.add("small");
-        sizes.add("medium");
-        sizes.add("large");
-        ModelProduct obj = new ModelProduct("Nike Shoes", sizes, 2000, "");
-        dbRef.push().setValue(obj);*/
-
-
-        //Uri file = Uri.fromFile(new File("F:\\Development\\Android_Studio_Ws\\tmp\\nike.jpg"));
-        //StorageReference riversRef = storageRef.child("images/nike.jpg");
-        //riversRef.putFile(file);
-            /*.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    // Get a URL to the uploaded content
-                    Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                }
-            })
-            .addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception exception) {
-                    // Handle unsuccessful uploads
-                    // ...
-                }
-            });*/
-
-        /*Button btnUpload = findViewById(R.id.btnProdUpload);
-        btnUpload.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(intent, 1);
-            }
-        });
-        */
     }
-
-    /*
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == 1 && resultCode == RESULT_OK && data != null && data.getData() != null) {
-            //Uri imguri = data.getData();
-            //ContentResolver ct = getContentResolver();
-            //MimeTypeMap mtm = MimeTypeMap.getSingleton();
-            //String ext = mtm.getExtensionFromMimeType(ct.getType(imguri));
-
-            //StorageReference tmp = storageRef.child(System.currentTimeMillis() + "." + ext);
-
-        }
-    }*/
 }

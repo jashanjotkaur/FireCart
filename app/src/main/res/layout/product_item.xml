@@ -8,47 +8,67 @@
 
     <ImageView
         android:id="@+id/imgviewProdTest"
-        android:layout_width="match_parent"
+        android:layout_width="350dp"
         android:layout_height="wrap_content"
         tools:srcCompat="@tools:sample/avatars"
-        android:layout_marginTop="100dp" />
+        android:layout_marginTop="10dp" />
 
     <TextView
         android:id="@+id/txtviewProdName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:text="Name" />
+        android:text="Name"
+        android:textAlignment="center"/>
 
     <TextView
         android:id="@+id/txtviewProdCost"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Cost"
+        android:textAlignment="center"
         android:layout_marginTop="20dp" />
 
     <TextView
-        android:id="@+id/txtviewProdSizeSmall"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Small"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="20dp"/>
+        android:text="Select Size"
+        android:textAlignment="center"
+        android:layout_marginTop="20dp" />
+
+    <Spinner
+        android:id="@+id/spinnerProdSize"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp" />
 
     <TextView
-        android:id="@+id/txtviewProdSizeMedium"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Enter Quantity"
+        android:textAlignment="center"
+        android:layout_marginTop="20dp" />
+    <EditText
+        android:id="@+id/txtProdQty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Medium"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="100dp"/>
+        android:textAlignment="center"
+        android:hint="Quantity" />
 
-    <TextView
-        android:id="@+id/txtviewProdSizeLarge"
-        android:layout_width="wrap_content"
+    <Button
+        android:id="@+id/btnProdToCart"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Large"
+        android:text="Add To Cart"
+        android:layout_marginTop="40dp"
+        android:textAlignment="center" />
+
+    <Button
+        android:id="@+id/btnProdCheckout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Checkout"
         android:layout_marginTop="20dp"
-        android:layout_marginLeft="200dp"/>
+        android:textAlignment="center" />
 
 </LinearLayout>
