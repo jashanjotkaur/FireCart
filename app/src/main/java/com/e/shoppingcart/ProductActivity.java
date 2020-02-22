@@ -4,43 +4,56 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.ContentProvider;
-import android.content.ContentResolver;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
+import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.MediaStore;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.webkit.MimeTypeMap;
-import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
-
-import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ProductActivity extends AppCompatActivity {
 
     private DatabaseReference dbRef;
-    private StorageReference storageRef;
-    private ImageView imgView;
+    //private StorageReference storageRef;
 
     private Bitmap bmp;
+    private ImageView img;
+
     private class GetImageTask extends AsyncTask<Void, Void, Void> {
+        ModelProduct prod;
+        TextView txtName;
+        ImageView img;
+
+        public GetImageTask(ModelProduct prod, TextView txtName, ImageView img) {
+            this.txtName = txtName;
+            this.img = img;
+            this.prod = prod;
+        }
+
         @Override
         protected Void doInBackground(Void... params) {
+            try {
+                URL url = new URL(prod.imgUrl);
+                Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+
             try {
                 URL url = new URL("https://firebasestorage.googleapis.com/v0/b/store-160a0.appspot.com/o/adidas.jpg?alt=media&token=1fca85c0-a408-4c54-bffd-7f083a04373c");
                 bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
@@ -50,7 +63,8 @@ public class ProductActivity extends AppCompatActivity {
             return null;
         }
         protected void onPostExecute(Void result) {
-            imgView.setImageBitmap(bmp);
+            txtName.setText(prod.name);
+            img.setImageBitmap(bmp);
         }
     }
 
@@ -59,10 +73,49 @@ public class ProductActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product);
 
-        storageRef = FirebaseStorage.getInstance().getReference("Images");
+        //storageRef = FirebaseStorage.getInstance().getReference("Images");
         dbRef = FirebaseDatabase.getInstance().getReference().child("Product");
-        imgView = findViewById(R.id.imgviewProdTest);
-        new GetImageTask().execute();
+
+        final LinearLayout layout = findViewById(R.id.layoutProdImages);
+        final LayoutInflater inflater = LayoutInflater.from(this);
+
+        dbRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                ModelProduct prod = dataSnapshot.getValue(ModelProduct.class);
+                System.out.println(prod);
+
+                View view = inflater.inflate(R.layout.product_item, layout, false);
+                TextView txtName = view.findViewById(R.id.txtviewProdName);
+                ImageView img = view.findViewById(R.id.imgviewProdTest);
+                new GetImageTask(prod, txtName, img).execute();
+                layout.addView(view);
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
+        //imgView = findViewById(R.id.imgviewProdTest);
+        //new GetImageTask().execute();
 
         /*List<String> sizes = new ArrayList<String>();
         sizes.add("small");
