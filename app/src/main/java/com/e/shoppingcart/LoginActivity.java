@@ -3,6 +3,7 @@ package com.e.shoppingcart;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -57,9 +58,8 @@ public class LoginActivity extends AppCompatActivity {
                         String toastMsg = "Login Failed";
                         if(task.isSuccessful()) {
                             toastMsg = "Login Success";
-                            // Move to new Activity
-                        } else {
-
+                            startActivity(new Intent(LoginActivity.this, ProductActivity.class));
+                            finish();   // User doesnt go back to register on clicking back
                         }
                         Toast.makeText(LoginActivity.this, toastMsg, Toast.LENGTH_SHORT).show();
                     }
