@@ -43,7 +43,22 @@ public class ProductActivity extends AppCompatActivity {
 
     private Bitmap bmp;
     private ImageView img;
-    private HashMap<ModelProduct, Integer> inCart = new HashMap<ModelProduct, Integer>();
+    private HashMap<ModelProduct, List<SizeQty>> inCart = new HashMap<ModelProduct, List<SizeQty>>();
+
+    class SizeQty {
+        public Integer qty;
+        public String size;
+
+        public SizeQty(Integer qty, String size) {
+            this.qty = qty;
+            this.size = size;
+        }
+
+        @Override
+        public String toString() {
+            return "Size: " + size + ", Qty: " + qty;
+        }
+    }
 
     private class GetImageTask extends AsyncTask<Void, Void, Void> {
         ModelProduct prod;
@@ -94,13 +109,18 @@ public class ProductActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     String qty = txtQty.getText().toString();
+                    String size = spinner.getSelectedItem().toString();
+
                     if(TextUtils.isEmpty(qty)) {
                         Toast.makeText(ProductActivity.this, "Invalid Quantity", Toast.LENGTH_SHORT).show();
                     } else {
+                        SizeQty obj = new SizeQty(Integer.parseInt(qty), size);
                         if(inCart.get(prod) == null) {
-                            inCart.put(prod, Integer.parseInt(qty));
+                            //inCart.put(prod, Integer.parseInt(qty));
+                            inCart.put(prod, new ArrayList<SizeQty>());
+                            inCart.get(prod).add(obj);
                         } else {
-                            inCart.put(prod, inCart.get(prod) + Integer.parseInt(qty));
+                            inCart.get(prod).add(obj);
                         }
                     }
                 }
@@ -112,7 +132,11 @@ public class ProductActivity extends AppCompatActivity {
                     Iterator itr = inCart.entrySet().iterator();
                     while (itr.hasNext()) {
                         Map.Entry mapElement = (Map.Entry)itr.next();
-                        System.out.println(mapElement.getKey() + " : " + mapElement.getValue());
+                        System.out.println(mapElement.getKey() + " :::: ");
+                        List<SizeQty> lst = (List<SizeQty>) mapElement.getValue();
+                        for(int i =0; i < lst.size(); i++) {
+                            System.out.println(lst.get(i));
+                        }
                     }
                 }
             });

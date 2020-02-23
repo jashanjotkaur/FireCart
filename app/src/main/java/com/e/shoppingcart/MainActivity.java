@@ -30,8 +30,8 @@ public class MainActivity extends AppCompatActivity {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //startActivity(new Intent(MainActivity.this, LoginActivity.class));
-                startActivity(new Intent(MainActivity.this, ProductActivity.class));
+                startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                //startActivity(new Intent(MainActivity.this, ProductActivity.class));
                 finish();   // User doesnt go back to register on clicking back
             }
         });
