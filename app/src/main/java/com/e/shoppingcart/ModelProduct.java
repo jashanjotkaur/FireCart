@@ -1,8 +1,9 @@
 package com.e.shoppingcart;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class ModelProduct {
+public class ModelProduct implements Serializable {
     public String name;
     public Integer cost;
     public String imgUrl;

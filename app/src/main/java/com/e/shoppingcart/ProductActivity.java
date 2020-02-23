@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.nfc.Tag;
@@ -30,6 +31,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+
+import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,22 +46,7 @@ public class ProductActivity extends AppCompatActivity {
 
     private Bitmap bmp;
     private ImageView img;
-    private HashMap<ModelProduct, List<SizeQty>> inCart = new HashMap<ModelProduct, List<SizeQty>>();
-
-    class SizeQty {
-        public Integer qty;
-        public String size;
-
-        public SizeQty(Integer qty, String size) {
-            this.qty = qty;
-            this.size = size;
-        }
-
-        @Override
-        public String toString() {
-            return "Size: " + size + ", Qty: " + qty;
-        }
-    }
+    private HashMap<ModelProduct, ArrayList<SizeQty>> inCart = new HashMap<ModelProduct, ArrayList<SizeQty>>();
 
     private class GetImageTask extends AsyncTask<Void, Void, Void> {
         ModelProduct prod;
@@ -132,12 +120,15 @@ public class ProductActivity extends AppCompatActivity {
                     Iterator itr = inCart.entrySet().iterator();
                     while (itr.hasNext()) {
                         Map.Entry mapElement = (Map.Entry)itr.next();
-                        System.out.println(mapElement.getKey() + " :::: ");
+                        //System.out.println(mapElement.getKey() + " :::: ");
                         List<SizeQty> lst = (List<SizeQty>) mapElement.getValue();
                         for(int i =0; i < lst.size(); i++) {
-                            System.out.println(lst.get(i));
+                            //System.out.println(lst.get(i));
                         }
                     }
+                    Intent intent = new Intent(ProductActivity.this, CheckoutActivity.class);
+                    intent.putExtra("Data", (Serializable) inCart);
+                    startActivity(intent);
                 }
             });
         }

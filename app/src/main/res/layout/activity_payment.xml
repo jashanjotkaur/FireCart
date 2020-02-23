@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".PaymentActivity">
+
+    <TextView
+        android:id="@+id/txtviewPaymentItems"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ABC" />
+
+    <Button
+        android:id="@+id/btnPaymentCash"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Pay By Cash" />
+
+    <Button
+        android:id="@+id/btnPaymentCredit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Pay By Credit Card" />
+
+
+</LinearLayout>
